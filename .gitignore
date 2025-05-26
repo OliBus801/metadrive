@@ -15,6 +15,7 @@
 **/**.zip.lock
 **/test_10maps.json
 /metadrive/examples/**.png
+/metadrive/results/*
 /metadrive/examples/**.jpg
 **/tmp_images/
 **/test.png

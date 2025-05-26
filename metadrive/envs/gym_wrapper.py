@@ -5,6 +5,10 @@ try:
     import gym
     import gym.spaces
 
+
+    import gymnasium as gymnasium
+    from gymnasium import spaces
+
     def gymnasiumToGym(space: gymnasium.spaces.Space) -> gym.spaces.Space:
         return gymnasium_to_gym(space)
 
@@ -138,6 +142,34 @@ try:
                     super().__setattr__(name, value)
 
         return GymEnvWrapper
+
+    
+    class GymToGymnasiumWrapper(gymnasium.Env):
+        def __init__(self, legacy_env: gym.Env):
+            self.legacy_env = legacy_env
+            self.action_space = gymToGymnasium(legacy_env.action_space)
+            self.observation_space = gymToGymnasium(legacy_env.observation_space)
+
+        def reset(self, *, seed=None, options=None):
+            obs = self.legacy_env.reset()
+            return obs, {}  # Gymnasium attend un tuple (obs, info)
+
+        def step(self, action):
+            obs, reward, done, info = self.legacy_env.step(action)
+            return obs, reward, done, False, info  # Gymnasium attend 5 valeurs
+
+        def render(self, *args, **kwargs):
+            return self.legacy_env.render(*args, **kwargs)
+
+        def close(self):
+            self.legacy_env.close()
+
+        def __getattr__(self, name):
+            return getattr(self.legacy_env, name)
+
+
+
+
 
     if __name__ == '__main__':
         from metadrive.envs.scenario_env import ScenarioEnv
